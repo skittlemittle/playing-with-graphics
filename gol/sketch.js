@@ -1,14 +1,7 @@
 // game of life, so original
 
 let bHeight, bWidth, gState;
-const resolution = 10;
-
-function drawBox(x, y, color, size) {
-    noStroke();
-    const c = color === 'B' ? 0 : 255;
-    fill(c);
-    rect(x * size, y * size, size, size);
-}
+const resolution = 5;
 
 function cntNeighbors(grid, x, y) {
     let sum = 0;
@@ -58,7 +51,9 @@ function draw() {
 
             // draw
             if (state === 1) {
-                drawBox(x, y, 'B', resolution);
+                noStroke();
+                fill(0);
+                rect(x * resolution, y * resolution, resolution, resolution);
             }
         }
     }
