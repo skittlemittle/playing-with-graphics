@@ -2,14 +2,14 @@
 // skittlemittle
 
 const w = 8;
-const h = 8;
+const h = 32;
 const pSize = 40;
 let coolingMap = [w * h];
 
 // returns cooling map
 function makeMap(density = 0.8, passes = 5) {
     let buff1 = [...Array(w * h)].map(() =>
-        (Math.random() % 2 > density) ? 255 : 0
+        (Math.random() % 2 > density) ? 128 : 0 // darker maps look better
     );
     let buff2 = [...Array(w * h)].fill(0);
     // smooth it
@@ -44,7 +44,7 @@ function keyPressed() {
     let string = "";
 
     for (let x = 0; x < w; x++) {
-        for (let y = 0; y < w; y++) {
+        for (let y = 0; y < h; y++) {
             const cur = coolingMap[x + y * w];
             string += cur + ',';
             fill(cur);

@@ -8,7 +8,7 @@
 #define COLOR_ORDER GRB
 #define CHIPSET WS2811
 #define BRIGHTNESS 64
-#define FRAMERATE 1
+#define FRAMERATE 5
 
 const uint8_t kMatrixWidth = 8;
 const uint8_t kMatrixHeight = 8;
@@ -21,21 +21,17 @@ int buffer1[NUM_LEDS];
 int buffer2[NUM_LEDS];
 int scroll = 0;
 // performance amirite
+const int mapHeight = 32;
 int coolingMap [] = {
-    0,0,0,0,0,0,0,0,
-    0,13,34,30,15,33,1,0,
-    0,44,44,50,62,10,37,0,
-    0,32,76,71,34,71,3,0,
-    0,54,54,60,73,11,42,0,
-    0,22,57,48,24,49,2,0,
-    0,22,19,24,26,4,16,0,
-    0,0,0,0,0,0,0,0
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,2,11,4,13,9,14,16,12,12,9,5,10,7,19,8,20,7,11,3,4,2,6,3,7,2,5,2,1,2,0,0,2,11,4,17,7,19,18,19,23,16,14,11,12,22,16,35,15,29,10,13,3,8,3,14,3,13,2,8,3,1,0,0,5,3,12,3,16,9,18,20,18,20,14,18,13,21,32,22,41,18,29,7,13,2,15,4,20,4,19,3,8,3,0,0,3,9,3,14,3,15,11,15,17,17,22,10,26,15,25,33,21,40,14,26,3,15,2,18,7,25,7,19,5,4,0,0,6,3,13,2,15,4,12,10,15,18,13,26,6,25,15,19,32,15,34,6,20,2,14,5,18,10,23,7,11,3,0,0,1,8,1,11,2,9,4,8,8,10,15,5,17,3,13,12,9,22,6,19,2,10,2,8,6,14,7,12,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
 uint16_t XYsafe(uint8_t x, uint8_t y);
 
 void setup()
 {
+    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS)
+        .setCorrection(TypicalSMD5050);
     FastLED.setBrightness(BRIGHTNESS);
     // a line of "source fire" at the bottom
     for (size_t x = 0; x < kMatrixWidth; x++) {
@@ -44,7 +40,6 @@ void setup()
         buffer1[index] = 255;
         buffer2[index] = 255;
     }
-    Serial.begin(9600);
 }
 
 void loop()
@@ -63,13 +58,13 @@ void loop()
             if (newColor < 0) newColor = 0;
             if (newColor > 255) newColor = 255;
 
-            buffer2[x + (y - 1) * kMatrixWidth] = newColor; // don't disturb source
+            buffer2[x + (y) * kMatrixWidth] = newColor; // don't disturb source
         }
     }
 
     // draw
-    for (size_t x = 0; x < kMatrixWidth; x++) {
-        for (size_t y = 0; y < kMatrixHeight; y++) {
+    for (int x = 0; x < kMatrixWidth; x++) {
+        for (int y = 0; y < kMatrixHeight; y++) {
             byte brightness = buffer2[x + y * kMatrixWidth];
             leds[(XYsafe(x, y))].setHSV(32, 255, brightness); //orange
         }
@@ -77,7 +72,7 @@ void loop()
     // swamp
     memcpy(buffer1, buffer2, sizeof buffer2);
     scroll++;
-    if (scroll > kMatrixHeight) scroll = 0;
+    if (scroll > mapHeight) scroll = 0;
 
     FastLED.show();
     delay(1000 / FRAMERATE);
